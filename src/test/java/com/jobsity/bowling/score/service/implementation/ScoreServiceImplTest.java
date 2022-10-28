@@ -6,12 +6,14 @@ import com.jobsity.bowling.score.dto.PinfallDto;
 import com.jobsity.bowling.score.dto.PlayerDto;
 import com.jobsity.bowling.score.dto.PlayerScoreLineDto;
 import com.jobsity.bowling.score.dto.PlayerScoresDto;
+import com.jobsity.bowling.score.exception.NotFoundException;
 import com.jobsity.bowling.score.helper.ResourceHelper;
 import com.jobsity.bowling.score.service.ReportService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,11 +34,14 @@ public class ScoreServiceImplTest {
 
     private static final String PLAYER_NAME = "Peter";
     private static final String REPORT_RESULT = "Report";
+    private static final String INVALID_PATH = "invalid-path.txt";
 
     private static final int FOURTH_FRAME = 4;
 
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private ReportService reportService;
     private ResourceHelper resourceHelper;
@@ -82,6 +87,15 @@ public class ScoreServiceImplTest {
         // Assert
         errorCollector.checkThat(gameResult, equalTo(REPORT_RESULT));
         verify(reportService).buildGameResultsReport(any(GameResultDto.class));
+    }
+
+    @Test
+    public void givenInvalidPathWhenCalculateAndReportGameResultShouldFail() throws Exception {
+        // Act && Assert
+        expectedException.expect(NotFoundException.class);
+        expectedException.expectMessage(String.format("Provided file %s does not exist!", INVALID_PATH));
+
+        scoreService.calculateAndReportScores(INVALID_PATH);
     }
 
     private List<PlayerScoreLineDto> buildValidScores() throws Exception {

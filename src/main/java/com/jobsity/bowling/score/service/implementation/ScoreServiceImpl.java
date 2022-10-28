@@ -188,8 +188,12 @@ public class ScoreServiceImpl implements ScoreService {
         return frameScore;
     }
 
-    private List<PlayerScoreLineDto> readScores(final String sourceFile) throws ReadException {
+    private List<PlayerScoreLineDto> readScores(final String sourceFile) throws ReadException, NotFoundException {
         final Path path = Paths.get(sourceFile);
+        if (!Files.exists(path)) {
+            throw new NotFoundException(String.format("Provided file %s does not exist!", sourceFile));
+        }
+
         try (Stream<String> fileStream = Files.lines(path)) {
             return fileStream.map(line -> {
                         try {
