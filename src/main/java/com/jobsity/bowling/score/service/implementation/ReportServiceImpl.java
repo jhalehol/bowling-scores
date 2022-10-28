@@ -2,6 +2,7 @@ package com.jobsity.bowling.score.service.implementation;
 
 import com.jobsity.bowling.score.dto.FrameScoreDto;
 import com.jobsity.bowling.score.dto.GameResultDto;
+import com.jobsity.bowling.score.dto.PinfallDto;
 import com.jobsity.bowling.score.dto.PlayerScoresDto;
 import com.jobsity.bowling.score.exception.ForbiddenException;
 import com.jobsity.bowling.score.service.ReportService;
@@ -57,9 +58,9 @@ public class ReportServiceImpl implements ReportService {
 
             if (frameScore.getFrame() == FrameScoreDto.MAX_FRAMES) {
                 detailedReport.append(String.format(LAST_SCORE_TEMPLATE,
-                        frameScore.getFirstPinfall().getValue(),
-                        frameScore.getSecondPinfall().getValue(),
-                        frameScore.getThirdPinfall().getValue()));
+                        getFormattedValue(frameScore.getFirstPinfall()),
+                        getFormattedValue(frameScore.getSecondPinfall()),
+                        getFormattedValue(frameScore.getThirdPinfall())));
             } else {
                 if (frameScore.isStrike()) {
                     detailedReport.append(STRIKE_SCORE_TEMPLATE);
@@ -78,5 +79,9 @@ public class ReportServiceImpl implements ReportService {
                 .append("\n").append(scoreReport)
                 .append("\n").toString();
 
+    }
+
+    private String getFormattedValue(final PinfallDto pinfall) {
+        return pinfall.getPinfallScore() == PinfallDto.MAXIMUM_SCORE ? "X" : pinfall.getValue();
     }
 }
